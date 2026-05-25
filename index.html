@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dynamic Flashcards Portal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      displayMath: [['$$', '$$'], ['\\[', '\\]']],
+      processEscapes: true
+    },
+    options: {
+      ignoreHtmlClass: 'tex2jax_ignore',
+      processHtmlClass: 'tex2jax_process'
+    }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="MathJax-script" async></script>
+
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #F5F2EC;
+    --surface: #FDFBF7;
+    --border: #E0DAD0;
+    --text: #1A1714;
+    --muted: #7A7168;
+    --hint: #B0A89C;
+    --green: #2D6A4F;
+    --green-bg: #D8F3DC;
+    --red: #9B2335;
+    --red-bg: #FDDDE2;
+    --accent: #C8621A;
+    --accent-light: #FBE8D8;
+    --progress: #2D6A4F;
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem 1rem 6rem;
+    position: relative;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 2rem;
+    width: 100%;
+    max-width: 620px;
+  }
+
+  header h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 2.5rem;
+    color: var(--text);
+    letter-spacing: -0.02em;
+    margin-bottom: 1rem;
+  }
+
+  .bubble-bar {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px;
+    margin-bottom: 1.25rem;
+  }
+
+  .bubble-btn {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.75rem;
+    padding: 5px 13px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.15s;
+    letter-spacing: 0.01em;
+  }
+
+  .bubble-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .bubble-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+  #topics {
+    margin-top: 0.5rem;
+    margin-bottom: 1.75rem;
+  }
+
+  .container {
+    width: 100%;
+    max-width: 620px;
+  }
+
+  .progress-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 1.25rem;
+  }
+
+  .progress-track {
+    flex: 1;
+    height: 3px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: var(--progress);
+    border-radius: 2px;
+    transition: width 0.4s ease;
+  }
+
+  .progress-label {
+    font-size: 0.8rem;
+    color: var(--muted);
+    white-space: nowrap;
+    min-width: 48px;
+    text-align: right;
+  }
+
+  .score-row {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    font-size: 0.8rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .score-got { color: var(--green); font-weight: 500; }
+  .score-hard { color: var(--red); font-weight: 500; }
+  .score-rem { color: var(--hint); }
+
+  .card-scene {
+    perspective: 1200px;
+    margin-bottom: 1.5rem;
+    min-height: 320px;
+  }
+
+  .card {
+    position: relative;
+    width: 100%;
+    min-height: 320px;
+    transform-style: preserve-3d;
+    transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+  }
+
+  .card.flipped { transform: rotateY(180deg); }
+
+  .card-face {
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 2.5rem 1.5rem;
+    text-align: center;
+    min-height: 320px;
+    overflow-y: auto;
+  }
+
+  .card-face var { font-style: normal; }
+
+  .card-back { transform: rotateY(180deg); }
+
+  .card-tag {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+    margin-bottom: 1.25rem;
+    font-weight: 500;
+  }
+
+  .card-q {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.35rem;
+    line-height: 1.45;
+    color: var(--text);
+    max-width: 480px;
+  }
+
+  .card-hint {
+    font-size: 0.75rem;
+    color: var(--hint);
+    margin-top: 1.75rem;
+    letter-spacing: 0.05em;
+  }
+
+  .card-a {
+    font-size: 0.95rem;
+    line-height: 1.65;
+    color: var(--text);
+    max-width: 480px;
+    margin-bottom: 1.5rem;
+    width: 100%;
+  }
+
+  .grade-row {
+    display: flex;
+    gap: 10px;
+    margin-top: auto;
+  }
+
+  .grade-btn {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.8rem;
+    padding: 7px 20px;
+    border-radius: 20px;
+    border: 1px solid;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-weight: 500;
+  }
+
+  .btn-got { background: var(--green-bg); color: var(--green); border-color: #A8D5B5; }
+  .btn-got:hover { background: #B7E4C7; }
+  .btn-hard { background: var(--red-bg); color: var(--red); border-color: #F5AABB; }
+  .btn-hard:hover { background: #FCC8D3; }
+
+  .nav-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .nav-btn {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem;
+    padding: 9px 22px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .nav-btn:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+  .nav-btn:disabled { opacity: 0.3; cursor: default; }
+
+  .center-controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .counter {
+    font-size: 0.8rem;
+    color: var(--muted);
+  }
+
+  .shuffle-btn {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.75rem;
+    padding: 5px 14px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .shuffle-btn:hover { color: var(--text); border-color: var(--muted); }
+  .arrow { font-size: 1rem; }
+
+  /* Optimized Right-Justified Intrinsic Dynamic Sized Progress Widget */
+  .module-total-badge {
+    position: fixed;
+    bottom: 4.5rem;
+    right: 1.5rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 10px 18px;
+    border-radius: 16px;
+    font-size: 0.75rem;
+    color: var(--muted);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+    z-index: 999;
+    
+    /* Fits directly to largest internal content size without dead space */
+    width: max-content;
+    max-width: calc(100vw - 3rem);
+    
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    text-align: right;
+    white-space: nowrap; /* Prevents text breaking onto multiple lines */
+    transition: all 0.2s ease-out;
+  }
+
+  .badge-header-row {
+    cursor: pointer;
+    user-select: none;
+    font-weight: 500;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .total-badge-title {
+    color: var(--text);
+    font-weight: 700;
+  }
+
+  .total-badge-percent {
+    color: var(--progress);
+    font-weight: 700;
+  }
+
+  /* Expands vertically dynamically up to screen limitations */
+  .badge-expanded-content {
+    display: none;
+    flex-direction: column;
+    gap: 6px;
+    border-top: 1px solid var(--border);
+    padding-top: 8px;
+    
+    /* Dynamically fills height; scrolls only if space hits browser header ceiling */
+    max-height: calc(100vh - 12rem);
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  .module-total-badge.expanded .badge-expanded-content {
+    display: flex;
+  }
+
+  .lecturer-progress-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    width: 100%;
+  }
+
+  .lecturer-row-title {
+    font-weight: 500;
+    color: var(--text);
+    cursor: pointer;
+    user-select: none;
+    display: block;
+  }
+  
+  .lecturer-row-title:hover {
+    color: var(--accent);
+  }
+
+  .topics-sub-container {
+    display: none;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 2px;
+    padding-right: 4px;
+  }
+
+  .lecturer-progress-item.lecturer-expanded .topics-sub-container {
+    display: flex;
+  }
+
+  .topic-progress-row {
+    font-size: 0.7rem;
+    color: var(--muted);
+    opacity: 0.85;
+    display: block;
+  }
+
+  .module-footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    padding: 1rem;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    z-index: 1000;
+  }
+
+  .module-btn {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 500;
+    padding: 8px 18px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .module-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .module-btn.active {
+    background: var(--text);
+    color: var(--surface);
+    border-color: var(--text);
+  }
+
+  @media (max-width: 480px) {
+    .module-total-badge {
+      position: static;
+      margin: 1.5rem auto 0;
+      width: max-content;
+      max-width: 100%;
+      box-shadow: none;
+      background: var(--surface);
+      border: 1px solid var(--border);
+    }
+  }
+</style>
+</head>
+<body class="tex2jax_ignore">
+
+<header>
+  <h1 id="main-title">...</h1>
+  <div class="bubble-bar tex2jax_process" id="lecturers"></div>
+</header>
+
+<div class="container text2jax_process">
+  <div class="progress-wrap">
+    <div class="progress-track"><div class="progress-fill" id="prog"></div></div>
+    <span class="progress-label" id="counter">0 / 0</span>
+  </div>
+
+  <div class="score-row">
+    <span>Got it: <span class="score-got" id="s-easy">0</span></span>
+    <span>Needs work: <span class="score-hard" id="s-hard">0</span></span>
+    <span class="score-rem" id="s-rem"></span>
+  </div>
+
+  <div class="bubble-bar" id="topics"></div>
+
+  <div class="card-scene">
+    <div class="card" id="card" onclick="flipCard()">
+      <div class="card-face card-front tex2jax_process">
+        <div class="card-tag" id="card-topic"></div>
+        <div class="card-q" id="card-q">Loading flashcards...</div>
+        <div class="card-hint">tap to reveal answer</div>
+      </div>
+      <div class="card-face card-back tex2jax_process">
+        <div class="card-tag" id="card-topic-b"></div>
+        <div class="card-a" id="card-a"></div>
+        <div class="grade-row">
+          <button class="grade-btn btn-got" onclick="grade(true,event)">&#10003; Got it</button>
+          <button class="grade-btn btn-hard" onclick="grade(false,event)">&#8635; Needs work</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="nav-row">
+    <button class="nav-btn" id="btn-prev" onclick="go(-1)"><span class="arrow">&#8592;</span> Prev</button>
+    <div class="center-controls">
+      <span class="counter" id="counter2"></span>
+      <button class="shuffle-btn" onclick="shuffle()">&#8646; Shuffle</button>
+    </div>
+    <button class="nav-btn" id="btn-next" onclick="go(1)">Next <span class="arrow">&#8594;</span></button>
+  </div>
+</div>
+
+<div class="module-total-badge" id="module-total-badge">
+  <div class="badge-header-row" onclick="toggleModuleExpansion(event)">
+    <span class="total-badge-title" id="badge-module-name">...</span> Complete:&nbsp;
+    <span class="total-badge-percent" id="badge-module-percent">0%</span>
+  </div>
+  <div class="badge-expanded-content" id="badge-expanded-content">
+    </div>
+</div>
+
+<div class="module-footer" id="modules-bar"></div>
+
+<script>
+let RAW_DATA = []; 
+let activeModule = "";
+let activeLecturer = "";
+let activeTopic = "All";
+
+let deck = [];
+let idx = 0;
+let flipped = false;
+let scores = { easy: 0, hard: 0 };
+
+// Stores card completion states globally across runtime views
+let SEEN_CARDS = new Map();
+
+// Tracks user layout toggle state requests for the expanded elements
+let IS_MODULE_EXPANDED = false;
+let EXPANDED_LECTURERS = new Set();
+
+async function fetchAllFlashcards() {
+  try {
+    const response = await fetch('/api/all_flashcards');
+    RAW_DATA = await response.json();
+    
+    if (RAW_DATA.length === 0) {
+      document.getElementById("card-q").textContent = "No data rows located in database storage.";
+      return;
+    }
+    
+    const uniqueModules = [...new Set(RAW_DATA.map(c => c.m))];
+    activeModule = uniqueModules[0];
+    
+    const lecturersForModule = [...new Set(RAW_DATA.filter(c => c.m === activeModule).map(c => c.l))];
+    activeLecturer = lecturersForModule[0];
+    
+    buildModuleNavigation();
+    updateModuleView();
+  } catch (err) {
+    console.error("Initialization failure contacting API vectors:", err);
+  }
+}
+
+function buildModuleNavigation() {
+  const uniqueModules = [...new Set(RAW_DATA.map(c => c.m))];
+  document.getElementById("modules-bar").innerHTML = uniqueModules.map(m => {
+    const cleanDisplayCode = m.toUpperCase();
+    return `<button class="module-btn${m === activeModule ? ' active' : ''}" onclick="setModule('${m}')">${cleanDisplayCode}</button>`;
+  }).join("");
+}
+
+function setModule(m) {
+  activeModule = m;
+  
+  const lecturersForModule = [...new Set(RAW_DATA.filter(c => c.m === activeModule).map(c => c.l))];
+  activeLecturer = lecturersForModule[0] || "";
+  activeTopic = "All";
+  
+  // Wipe out open menu parameters entirely on core module shifts
+  collapseAllProgressTrees();
+  
+  buildModuleNavigation();
+  updateModuleView();
+}
+
+function updateModuleView() {
+  document.getElementById("main-title").textContent = activeModule.toUpperCase();
+  
+  const lecturersForModule = [...new Set(RAW_DATA.filter(c => c.m === activeModule).map(c => c.l))];
+  document.getElementById("lecturers").innerHTML = lecturersForModule.map(l =>
+    `<button class="bubble-btn${l === activeLecturer ? ' active' : ''}" onclick="setLecturer('${l.replace(/'/g, "\\'")}')">${l}</button>`
+  ).join("");
+
+  buildTopics();
+  filterDeck();
+}
+
+function setLecturer(l) {
+  activeLecturer = l;
+  activeTopic = "All";
+  updateModuleView();
+}
+
+function buildTopics() {
+  const matchingCards = RAW_DATA.filter(c => c.m === activeModule && c.l === activeLecturer);
+  const ts = ["All", ...new Set(matchingCards.map(c => c.t))];
+  
+  document.getElementById("topics").innerHTML = ts.map(t =>
+    `<button class="bubble-btn${t === activeTopic ? ' active' : ''}" onclick="setTopic('${t.replace(/'/g, "\\'")}')">${t}</button>`
+  ).join("");
+}
+
+function setTopic(t) {
+  activeTopic = t;
+  buildTopics();
+  filterDeck();
+}
+
+function filterDeck() {
+  const baseCards = RAW_DATA.filter(c => c.m === activeModule && c.l === activeLecturer);
+  deck = activeTopic === "All" ? [...baseCards] : baseCards.filter(c => c.t === activeTopic);
+  
+  idx = 0; scores = { easy: 0, hard: 0 }; flipped = false;
+  document.getElementById("s-easy").textContent = 0;
+  document.getElementById("s-hard").textContent = 0;
+  document.getElementById("card").classList.remove("flipped");
+  
+  render();
+}
+
+function shuffle() {
+  for (let i = deck.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [deck[i], deck[j]] = [deck[j], deck[i]];
+  }
+  idx = 0; flipped = false; render();
+}
+
+function flipCard() {
+  if (!flipped) {
+    flipped = true;
+    document.getElementById("card").classList.add("flipped");
+    triggerMathJax();
+  }
+}
+
+function grade(easy, e) {
+  e.stopPropagation();
+  if (easy) scores.easy++; else scores.hard++;
+  document.getElementById("s-easy").textContent = scores.easy;
+  document.getElementById("s-hard").textContent = scores.hard;
+  
+  const currentCard = deck[idx];
+  if (currentCard) {
+    SEEN_CARDS.set(currentCard.q, true);
+  }
+  
+  go(1);
+}
+
+function go(dir) {
+  if (deck.length === 0) return;
+  idx = Math.max(0, Math.min(deck.length - 1, idx + dir));
+  flipped = false;
+  document.getElementById("card").classList.remove("flipped");
+  render();
+}
+
+/* Expansion state handling logic functions */
+function toggleModuleExpansion(e) {
+  e.stopPropagation();
+  const widget = document.getElementById("module-total-badge");
+  
+  if (widget.classList.contains("expanded")) {
+    collapseAllProgressTrees();
+  } else {
+    widget.classList.add("expanded");
+    IS_MODULE_EXPANDED = true;
+  }
+  updateGlobalModuleProgress();
+}
+
+function toggleLecturerExpansion(lecturerName, e) {
+  e.stopPropagation();
+  if (EXPANDED_LECTURERS.has(lecturerName)) {
+    EXPANDED_LECTURERS.delete(lecturerName);
+  } else {
+    EXPANDED_LECTURERS.add(lecturerName);
+  }
+  updateGlobalModuleProgress();
+}
+
+function collapseAllProgressTrees() {
+  const widget = document.getElementById("module-total-badge");
+  widget.classList.remove("expanded");
+  IS_MODULE_EXPANDED = false;
+  EXPANDED_LECTURERS.clear();
+}
+
+function updateGlobalModuleProgress() {
+  const totalCardsInModule = RAW_DATA.filter(c => c.m === activeModule);
+  
+  if (totalCardsInModule.length === 0) {
+    document.getElementById("badge-module-name").textContent = activeModule.toUpperCase();
+    document.getElementById("badge-module-percent").textContent = "0%";
+    document.getElementById("badge-expanded-content").innerHTML = "";
+    return;
+  }
+  
+  // 1. Calculate Core Module Code Level Progress Metric
+  let moduleAnsweredCount = 0;
+  totalCardsInModule.forEach(card => {
+    if (SEEN_CARDS.has(card.q)) moduleAnsweredCount++;
+  });
+  const totalModulePercent = Math.round((moduleAnsweredCount / totalCardsInModule.length) * 100);
+  
+  document.getElementById("badge-module-name").textContent = activeModule.toUpperCase();
+  document.getElementById("badge-module-percent").textContent = `${totalModulePercent}%`;
+  
+  // Apply structural class synchronization
+  const widget = document.getElementById("module-total-badge");
+  if (IS_MODULE_EXPANDED) {
+    widget.classList.add("expanded");
+  } else {
+    widget.classList.remove("expanded");
+  }
+
+  // 2. Loop and map dynamic multi-tiered sub-elements calculations
+  const lecturersInModule = [...new Set(totalCardsInModule.map(c => c.l))].sort();
+  const expandedContentArea = document.getElementById("badge-expanded-content");
+  
+  let structuralHTML = "";
+  
+  lecturersInModule.forEach(lec => {
+    const cardsForLec = totalCardsInModule.filter(c => c.l === lec);
+    let lecAnswered = 0;
+    cardsForLec.forEach(c => { if (SEEN_CARDS.has(c.q)) lecAnswered++; });
+    const lecPercent = Math.round((lecAnswered / cardsForLec.length) * 100);
+    
+    const isLecExpanded = EXPANDED_LECTURERS.has(lec);
+    const expandedClassStr = isLecExpanded ? " lecturer-progress-item lecturer-expanded" : " lecturer-progress-item";
+    
+    structuralHTML += `<div class="${expandedClassStr}">`;
+    structuralHTML += `  <span class="lecturer-row-title" onclick="toggleLecturerExpansion('${lec.replace(/'/g, "\\'")}', event)">${lec} - ${lecPercent}%</span>`;
+    structuralHTML += `  <div class="topics-sub-container">`;
+    
+    // Extract individual topics metrics mapped to this specific lecturer context node
+    const topicsForLec = [...new Set(cardsForLec.map(c => c.t))].sort();
+    topicsForLec.forEach(top => {
+      const cardsForTopic = cardsForLec.filter(c => c.t === top);
+      let topAnswered = 0;
+      cardsForTopic.forEach(c => { if (SEEN_CARDS.has(c.q)) topAnswered++; });
+      const topPercent = Math.round((topAnswered / cardsForTopic.length) * 100);
+      
+      structuralHTML += `    <span class="topic-progress-row">${top.toUpperCase()} - ${topPercent}%</span>`;
+    });
+    
+    structuralHTML += `  </div>`;
+    structuralHTML += `</div>`;
+  });
+  
+  expandedContentArea.innerHTML = structuralHTML;
+}
+
+function triggerMathJax() {
+  if (window.MathJax && window.MathJax.typesetPromise) {
+    window.MathJax.typesetPromise();
+  }
+}
+
+function render() {
+  if (deck.length === 0) {
+    document.getElementById("card-topic").textContent = "N/A";
+    document.getElementById("card-topic-b").textContent = "N/A";
+    document.getElementById("card-q").textContent = "No flashcards found.";
+    document.getElementById("card-a").textContent = "";
+    document.getElementById("counter").textContent = "0 / 0";
+    document.getElementById("counter2").textContent = "0 / 0";
+    document.getElementById("prog").style.width = "0%";
+    document.getElementById("btn-prev").disabled = true;
+    document.getElementById("btn-next").disabled = true;
+    document.getElementById("s-rem").textContent = "";
+    updateGlobalModuleProgress();
+    return;
+  }
+
+  const c = deck[idx];
+  document.getElementById("card-topic").textContent = c.t;
+  document.getElementById("card-topic-b").textContent = c.t;
+  document.getElementById("card-q").textContent = c.q;
+  document.getElementById("card-a").textContent = c.a;
+  
+  const label = `${idx + 1} / ${deck.length}`;
+  document.getElementById("counter").textContent = label;
+  document.getElementById("counter2").textContent = label;
+  document.getElementById("prog").style.width = ((idx + 1) / deck.length * 100) + "%";
+  
+  document.getElementById("btn-prev").disabled = idx === 0;
+  document.getElementById("btn-next").disabled = idx === deck.length - 1;
+  
+  const done = scores.easy + scores.hard;
+  const rem = deck.length - done;
+  document.getElementById("s-rem").textContent = rem > 0 ? `${rem} remaining` : "All reviewed!";
+
+  updateGlobalModuleProgress();
+  triggerMathJax();
+}
+
+fetchAllFlashcards();
+</script>
+</body>
+</html>
