@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dynamic Flashcards Portal</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
 
 <script>
   window.MathJax = {
@@ -138,6 +138,7 @@
     justify-content: center;
     font-size: 0.8rem;
     margin-bottom: 0.5rem;
+    align-items: center;
   }
 
   .score-got { color: var(--green); font-weight: 500; }
@@ -303,7 +304,6 @@
     box-shadow: 0 4px 16px rgba(0,0,0,0.06);
     z-index: 999;
     
-    /* Fits directly to largest internal content size without dead space */
     width: max-content;
     max-width: calc(100vw - 3rem);
     
@@ -311,7 +311,7 @@
     flex-direction: column;
     gap: 8px;
     text-align: right;
-    white-space: nowrap; /* Prevents text breaking onto multiple lines */
+    white-space: nowrap;
     transition: all 0.2s ease-out;
   }
 
@@ -335,15 +335,12 @@
     font-weight: 700;
   }
 
-  /* Expands vertically dynamically up to screen limitations */
   .badge-expanded-content {
     display: none;
     flex-direction: column;
     gap: 6px;
     border-top: 1px solid var(--border);
     padding-top: 8px;
-    
-    /* Dynamically fills height; scrolls only if space hits browser header ceiling */
     max-height: calc(100vh - 12rem);
     overflow-y: auto;
     overflow-x: hidden;
@@ -479,10 +476,14 @@
 
   <div class="nav-row">
     <button class="nav-btn" id="btn-prev" onclick="go(-1)"><span class="arrow">&#8592;</span> Prev</button>
+    
     <div class="center-controls">
       <span class="counter" id="counter2"></span>
       <button class="shuffle-btn" onclick="shuffle()">&#8646; Shuffle</button>
+      
+      <button class="shuffle-btn" style="margin-top: 6px; border-color: var(--border); color: var(--hint);" onclick="clearSavedProgress()">&#215; Reset All</button>
     </div>
+    
     <button class="nav-btn" id="btn-next" onclick="go(1)">Next <span class="arrow">&#8594;</span></button>
   </div>
 </div>
@@ -509,10 +510,11 @@ let idx = 0;
 let flipped = false;
 let scores = { easy: 0, hard: 0 };
 
-// Stores card completion states globally across runtime views
-let SEEN_CARDS = new Map();
+// SAFE PROGRESS: Pulls historical local browser mapping on load, or starts clean
+let SEEN_CARDS = localStorage.getItem('wbed_flashcard_progress') 
+  ? new Map(JSON.parse(localStorage.getItem('wbed_flashcard_progress'))) 
+  : new Map();
 
-// Tracks user layout toggle state requests for the expanded elements
 let IS_MODULE_EXPANDED = false;
 let EXPANDED_LECTURERS = new Set();
 
@@ -554,9 +556,7 @@ function setModule(m) {
   activeLecturer = lecturersForModule[0] || "";
   activeTopic = "All";
   
-  // Wipe out open menu parameters entirely on core module shifts
   collapseAllProgressTrees();
-  
   buildModuleNavigation();
   updateModuleView();
 }
@@ -631,9 +631,22 @@ function grade(easy, e) {
   const currentCard = deck[idx];
   if (currentCard) {
     SEEN_CARDS.set(currentCard.q, true);
+    localStorage.setItem('wbed_flashcard_progress', JSON.stringify([...SEEN_CARDS]));
   }
   
   go(1);
+}
+
+// Master progress erasure routine safely bound behind an alert prompt modal
+function clearSavedProgress() {
+  const validationConfirmation = confirm("Are you sure you want to completely clear your flashcard completion history? This resets all percentages back to 0%.");
+  
+  if (validationConfirmation) {
+    localStorage.removeItem('wbed_flashcard_progress');
+    SEEN_CARDS = new Map();
+    updateGlobalModuleProgress();
+    render();
+  }
 }
 
 function go(dir) {
@@ -644,7 +657,6 @@ function go(dir) {
   render();
 }
 
-/* Expansion state handling logic functions */
 function toggleModuleExpansion(e) {
   e.stopPropagation();
   const widget = document.getElementById("module-total-badge");
@@ -685,7 +697,6 @@ function updateGlobalModuleProgress() {
     return;
   }
   
-  // 1. Calculate Core Module Code Level Progress Metric
   let moduleAnsweredCount = 0;
   totalCardsInModule.forEach(card => {
     if (SEEN_CARDS.has(card.q)) moduleAnsweredCount++;
@@ -695,7 +706,6 @@ function updateGlobalModuleProgress() {
   document.getElementById("badge-module-name").textContent = activeModule.toUpperCase();
   document.getElementById("badge-module-percent").textContent = `${totalModulePercent}%`;
   
-  // Apply structural class synchronization
   const widget = document.getElementById("module-total-badge");
   if (IS_MODULE_EXPANDED) {
     widget.classList.add("expanded");
@@ -703,7 +713,6 @@ function updateGlobalModuleProgress() {
     widget.classList.remove("expanded");
   }
 
-  // 2. Loop and map dynamic multi-tiered sub-elements calculations
   const lecturersInModule = [...new Set(totalCardsInModule.map(c => c.l))].sort();
   const expandedContentArea = document.getElementById("badge-expanded-content");
   
@@ -722,7 +731,6 @@ function updateGlobalModuleProgress() {
     structuralHTML += `  <span class="lecturer-row-title" onclick="toggleLecturerExpansion('${lec.replace(/'/g, "\\'")}', event)">${lec} - ${lecPercent}%</span>`;
     structuralHTML += `  <div class="topics-sub-container">`;
     
-    // Extract individual topics metrics mapped to this specific lecturer context node
     const topicsForLec = [...new Set(cardsForLec.map(c => c.t))].sort();
     topicsForLec.forEach(top => {
       const cardsForTopic = cardsForLec.filter(c => c.t === top);
