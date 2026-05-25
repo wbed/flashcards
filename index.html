@@ -508,12 +508,16 @@ let activeTopic = "All";
 let deck = [];
 let idx = 0;
 let flipped = false;
-let scores = { easy: 0, hard: 0 };
 
 // SAFE PROGRESS: Pulls historical local browser mapping on load, or starts clean
 let SEEN_CARDS = localStorage.getItem('wbed_flashcard_progress') 
   ? new Map(JSON.parse(localStorage.getItem('wbed_flashcard_progress'))) 
   : new Map();
+
+// PERMANENT COUNTERS: Restores metric fields across page refreshes
+let scores = localStorage.getItem('wbed_flashcard_scores')
+  ? JSON.parse(localStorage.getItem('wbed_flashcard_scores'))
+  : { easy: 0, hard: 0 };
 
 let IS_MODULE_EXPANDED = false;
 let EXPANDED_LECTURERS = new Set();
@@ -598,9 +602,11 @@ function filterDeck() {
   const baseCards = RAW_DATA.filter(c => c.m === activeModule && c.l === activeLecturer);
   deck = activeTopic === "All" ? [...baseCards] : baseCards.filter(c => c.t === activeTopic);
   
-  idx = 0; scores = { easy: 0, hard: 0 }; flipped = false;
-  document.getElementById("s-easy").textContent = 0;
-  document.getElementById("s-hard").textContent = 0;
+  idx = 0; flipped = false;
+  
+  // Displays permanent metrics cleanly instead of wiping them back to zero
+  document.getElementById("s-easy").textContent = scores.easy;
+  document.getElementById("s-hard").textContent = scores.hard;
   document.getElementById("card").classList.remove("flipped");
   
   render();
@@ -634,16 +640,22 @@ function grade(easy, e) {
     localStorage.setItem('wbed_flashcard_progress', JSON.stringify([...SEEN_CARDS]));
   }
   
+  // Save both counters directly to disk
+  localStorage.setItem('wbed_flashcard_scores', JSON.stringify(scores));
+  
   go(1);
 }
 
 // Master progress erasure routine safely bound behind an alert prompt modal
 function clearSavedProgress() {
-  const validationConfirmation = confirm("Are you sure you want to completely clear your flashcard completion history? This resets all percentages back to 0%.");
+  const validationConfirmation = confirm("Are you sure you want to completely clear your flashcard completion history? This resets all percentages and category scores back to 0%.");
   
   if (validationConfirmation) {
     localStorage.removeItem('wbed_flashcard_progress');
+    localStorage.removeItem('wbed_flashcard_scores');
     SEEN_CARDS = new Map();
+    scores = { easy: 0, hard: 0 };
+    
     updateGlobalModuleProgress();
     render();
   }
@@ -784,6 +796,7 @@ function render() {
   document.getElementById("btn-prev").disabled = idx === 0;
   document.getElementById("btn-next").disabled = idx === deck.length - 1;
   
+  // Computes the remaining category value dynamically using your loaded storage variables
   const done = scores.easy + scores.hard;
   const rem = deck.length - done;
   document.getElementById("s-rem").textContent = rem > 0 ? `${rem} remaining` : "All reviewed!";
