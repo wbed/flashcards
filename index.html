@@ -6,7 +6,7 @@
 <title>Dynamic Flashcards Portal</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
-
+ 
 <script>
   window.MathJax = {
     tex: {
@@ -21,10 +21,10 @@
   };
 </script>
 <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="MathJax-script" async></script>
-
+ 
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
+ 
   :root {
     --bg: #F5F2EC;
     --surface: #FDFBF7;
@@ -40,7 +40,7 @@
     --accent-light: #FBE8D8;
     --progress: #2D6A4F;
   }
-
+ 
   body {
     font-family: 'DM Sans', sans-serif;
     background: var(--bg);
@@ -52,14 +52,14 @@
     padding: 2rem 1rem 6rem;
     position: relative;
   }
-
+ 
   header {
     text-align: center;
     margin-bottom: 2rem;
     width: 100%;
     max-width: 620px;
   }
-
+ 
   header h1 {
     font-family: 'DM Serif Display', serif;
     font-size: 2.5rem;
@@ -67,7 +67,7 @@
     letter-spacing: -0.02em;
     margin-bottom: 1rem;
   }
-
+ 
   .bubble-bar {
     display: flex;
     flex-wrap: wrap;
@@ -75,7 +75,7 @@
     gap: 6px;
     margin-bottom: 1.25rem;
   }
-
+ 
   .bubble-btn {
     font-family: 'DM Sans', sans-serif;
     font-size: 0.75rem;
@@ -88,27 +88,27 @@
     transition: all 0.15s;
     letter-spacing: 0.01em;
   }
-
+ 
   .bubble-btn:hover { border-color: var(--accent); color: var(--accent); }
   .bubble-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
-
+ 
   #topics {
     margin-top: 0.5rem;
     margin-bottom: 1.75rem;
   }
-
+ 
   .container {
     width: 100%;
     max-width: 620px;
   }
-
+ 
   .progress-wrap {
     display: flex;
     align-items: center;
     gap: 10px;
     margin-bottom: 1.25rem;
   }
-
+ 
   .progress-track {
     flex: 1;
     height: 3px;
@@ -116,14 +116,14 @@
     border-radius: 2px;
     overflow: hidden;
   }
-
+ 
   .progress-fill {
     height: 100%;
     background: var(--progress);
     border-radius: 2px;
     transition: width 0.4s ease;
   }
-
+ 
   .progress-label {
     font-size: 0.8rem;
     color: var(--muted);
@@ -131,7 +131,7 @@
     min-width: 48px;
     text-align: right;
   }
-
+ 
   .score-row {
     display: flex;
     gap: 1rem;
@@ -140,17 +140,17 @@
     margin-bottom: 0.5rem;
     align-items: center;
   }
-
+ 
   .score-got { color: var(--green); font-weight: 500; }
   .score-hard { color: var(--red); font-weight: 500; }
   .score-rem { color: var(--hint); }
-
+ 
   .card-scene {
     perspective: 1200px;
     margin-bottom: 1.5rem;
     min-height: 320px;
   }
-
+ 
   .card {
     position: relative;
     width: 100%;
@@ -159,9 +159,9 @@
     transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1);
     cursor: pointer;
   }
-
+ 
   .card.flipped { transform: rotateY(180deg); }
-
+ 
   .card-face {
     position: absolute;
     inset: 0;
@@ -178,11 +178,11 @@
     min-height: 320px;
     overflow-y: auto;
   }
-
+ 
   .card-face var { font-style: normal; }
-
+ 
   .card-back { transform: rotateY(180deg); }
-
+ 
   .card-tag {
     font-size: 0.7rem;
     text-transform: uppercase;
@@ -191,7 +191,7 @@
     margin-bottom: 1.25rem;
     font-weight: 500;
   }
-
+ 
   .card-q {
     font-family: 'DM Serif Display', serif;
     font-size: 1.35rem;
@@ -199,14 +199,14 @@
     color: var(--text);
     max-width: 480px;
   }
-
+ 
   .card-hint {
     font-size: 0.75rem;
     color: var(--hint);
     margin-top: 1.75rem;
     letter-spacing: 0.05em;
   }
-
+ 
   .card-a {
     font-size: 0.95rem;
     line-height: 1.65;
@@ -215,13 +215,13 @@
     margin-bottom: 1.5rem;
     width: 100%;
   }
-
+ 
   .grade-row {
     display: flex;
     gap: 10px;
     margin-top: auto;
   }
-
+ 
   .grade-btn {
     font-family: 'DM Sans', sans-serif;
     font-size: 0.8rem;
@@ -232,19 +232,19 @@
     transition: all 0.15s;
     font-weight: 500;
   }
-
+ 
   .btn-got { background: var(--green-bg); color: var(--green); border-color: #A8D5B5; }
   .btn-got:hover { background: #B7E4C7; }
   .btn-hard { background: var(--red-bg); color: var(--red); border-color: #F5AABB; }
   .btn-hard:hover { background: #FCC8D3; }
-
+ 
   .nav-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 12px;
   }
-
+ 
   .nav-btn {
     font-family: 'DM Sans', sans-serif;
     font-size: 0.85rem;
@@ -259,22 +259,28 @@
     align-items: center;
     gap: 6px;
   }
-
+ 
   .nav-btn:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
   .nav-btn:disabled { opacity: 0.3; cursor: default; }
-
+ 
+  .left-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+ 
   .center-controls {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
   }
-
+ 
   .counter {
     font-size: 0.8rem;
     color: var(--muted);
   }
-
+ 
   .shuffle-btn {
     font-family: 'DM Sans', sans-serif;
     font-size: 0.75rem;
@@ -286,11 +292,29 @@
     cursor: pointer;
     transition: all 0.15s;
   }
-
+ 
   .shuffle-btn:hover { color: var(--text); border-color: var(--muted); }
+  
+  .reset-btn {
+    position: fixed;
+    bottom: 4.5rem;
+    left: 1.5rem;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.75rem;
+    padding: 9px 14px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--hint);
+    cursor: pointer;
+    transition: all 0.15s;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+    z-index: 999;
+  }
+ 
+  .reset-btn:hover { color: var(--red); border-color: var(--red); background: var(--red-bg); }
   .arrow { font-size: 1rem; }
-
-  /* Optimized Right-Justified Intrinsic Dynamic Sized Progress Widget */
+ 
   .module-total-badge {
     position: fixed;
     bottom: 4.5rem;
@@ -314,7 +338,7 @@
     white-space: nowrap;
     transition: all 0.2s ease-out;
   }
-
+ 
   .badge-header-row {
     cursor: pointer;
     user-select: none;
@@ -324,17 +348,17 @@
     align-items: center;
     gap: 4px;
   }
-
+ 
   .total-badge-title {
     color: var(--text);
     font-weight: 700;
   }
-
+ 
   .total-badge-percent {
     color: var(--progress);
     font-weight: 700;
   }
-
+ 
   .badge-expanded-content {
     display: none;
     flex-direction: column;
@@ -345,18 +369,18 @@
     overflow-y: auto;
     overflow-x: hidden;
   }
-
+ 
   .module-total-badge.expanded .badge-expanded-content {
     display: flex;
   }
-
+ 
   .lecturer-progress-item {
     display: flex;
     flex-direction: column;
     gap: 4px;
     width: 100%;
   }
-
+ 
   .lecturer-row-title {
     font-weight: 500;
     color: var(--text);
@@ -368,7 +392,7 @@
   .lecturer-row-title:hover {
     color: var(--accent);
   }
-
+ 
   .topics-sub-container {
     display: none;
     flex-direction: column;
@@ -376,18 +400,18 @@
     margin-top: 2px;
     padding-right: 4px;
   }
-
+ 
   .lecturer-progress-item.lecturer-expanded .topics-sub-container {
     display: flex;
   }
-
+ 
   .topic-progress-row {
     font-size: 0.7rem;
     color: var(--muted);
     opacity: 0.85;
     display: block;
   }
-
+ 
   .module-footer {
     position: fixed;
     bottom: 0;
@@ -401,7 +425,7 @@
     gap: 10px;
     z-index: 1000;
   }
-
+ 
   .module-btn {
     font-family: 'DM Sans', sans-serif;
     font-size: 0.85rem;
@@ -414,15 +438,22 @@
     cursor: pointer;
     transition: all 0.15s;
   }
-
+ 
   .module-btn:hover { border-color: var(--accent); color: var(--accent); }
   .module-btn.active {
     background: var(--text);
     color: var(--surface);
     border-color: var(--text);
   }
-
+ 
   @media (max-width: 480px) {
+    .reset-btn {
+      position: static;
+      margin: 1rem auto 0;
+      box-shadow: none;
+      display: block;
+      width: max-content;
+    }
     .module-total-badge {
       position: static;
       margin: 1.5rem auto 0;
@@ -436,26 +467,26 @@
 </style>
 </head>
 <body class="tex2jax_ignore">
-
+ 
 <header>
   <h1 id="main-title">...</h1>
   <div class="bubble-bar tex2jax_process" id="lecturers"></div>
 </header>
-
+ 
 <div class="container text2jax_process">
   <div class="progress-wrap">
     <div class="progress-track"><div class="progress-fill" id="prog"></div></div>
     <span class="progress-label" id="counter">0 / 0</span>
   </div>
-
+ 
   <div class="score-row">
     <span>Got it: <span class="score-got" id="s-easy">0</span></span>
     <span>Needs work: <span class="score-hard" id="s-hard">0</span></span>
     <span class="score-rem" id="s-rem"></span>
   </div>
-
+ 
   <div class="bubble-bar" id="topics"></div>
-
+ 
   <div class="card-scene">
     <div class="card" id="card" onclick="flipCard()">
       <div class="card-face card-front tex2jax_process">
@@ -473,21 +504,23 @@
       </div>
     </div>
   </div>
-
+ 
   <div class="nav-row">
-    <button class="nav-btn" id="btn-prev" onclick="go(-1)"><span class="arrow">&#8592;</span> Prev</button>
+    <div class="left-controls">
+      <button class="nav-btn" id="btn-prev" onclick="go(-1)"><span class="arrow">&#8592;</span> Prev</button>
+    </div>
     
     <div class="center-controls">
       <span class="counter" id="counter2"></span>
       <button class="shuffle-btn" onclick="shuffle()">&#8646; Shuffle</button>
-      
-      <button class="shuffle-btn" style="margin-top: 6px; border-color: var(--border); color: var(--hint);" onclick="clearSavedProgress()">&#215; Reset All</button>
     </div>
     
     <button class="nav-btn" id="btn-next" onclick="go(1)">Next <span class="arrow">&#8594;</span></button>
   </div>
 </div>
-
+ 
+<button class="reset-btn" onclick="clearSavedProgress()">&#215; Reset All</button>
+ 
 <div class="module-total-badge" id="module-total-badge">
   <div class="badge-header-row" onclick="toggleModuleExpansion(event)">
     <span class="total-badge-title" id="badge-module-name">...</span> Complete:&nbsp;
@@ -496,32 +529,38 @@
   <div class="badge-expanded-content" id="badge-expanded-content">
     </div>
 </div>
-
+ 
 <div class="module-footer" id="modules-bar"></div>
-
+ 
 <script>
 let RAW_DATA = []; 
 let activeModule = "";
 let activeLecturer = "";
 let activeTopic = "All";
-
+ 
 let deck = [];
 let idx = 0;
 let flipped = false;
-
-// SAFE PROGRESS: Pulls historical local browser mapping on load, or starts clean
+ 
 let SEEN_CARDS = localStorage.getItem('wbed_flashcard_progress') 
   ? new Map(JSON.parse(localStorage.getItem('wbed_flashcard_progress'))) 
   : new Map();
-
-// PERMANENT COUNTERS: Restores metric fields across page refreshes
-let scores = localStorage.getItem('wbed_flashcard_scores')
-  ? JSON.parse(localStorage.getItem('wbed_flashcard_scores'))
-  : { easy: 0, hard: 0 };
-
+ 
+let HARD_CARDS = localStorage.getItem('wbed_flashcard_hard') 
+  ? new Set(JSON.parse(localStorage.getItem('wbed_flashcard_hard'))) 
+  : new Set();
+ 
+// No persistent 'scores' object — counts are derived live from SEEN_CARDS / HARD_CARDS
+// filtered against the current deck in syncScoresFromMap().
+ 
+// Load card position registry dictionary from local storage
+let CARD_POSITIONS = localStorage.getItem('wbed_flashcard_positions')
+  ? JSON.parse(localStorage.getItem('wbed_flashcard_positions'))
+  : {};
+ 
 let IS_MODULE_EXPANDED = false;
 let EXPANDED_LECTURERS = new Set();
-
+ 
 async function fetchAllFlashcards() {
   try {
     const response = await fetch('/api/all_flashcards');
@@ -544,7 +583,7 @@ async function fetchAllFlashcards() {
     console.error("Initialization failure contacting API vectors:", err);
   }
 }
-
+ 
 function buildModuleNavigation() {
   const uniqueModules = [...new Set(RAW_DATA.map(c => c.m))];
   document.getElementById("modules-bar").innerHTML = uniqueModules.map(m => {
@@ -552,7 +591,7 @@ function buildModuleNavigation() {
     return `<button class="module-btn${m === activeModule ? ' active' : ''}" onclick="setModule('${m}')">${cleanDisplayCode}</button>`;
   }).join("");
 }
-
+ 
 function setModule(m) {
   activeModule = m;
   
@@ -564,7 +603,7 @@ function setModule(m) {
   buildModuleNavigation();
   updateModuleView();
 }
-
+ 
 function updateModuleView() {
   document.getElementById("main-title").textContent = activeModule.toUpperCase();
   
@@ -572,17 +611,17 @@ function updateModuleView() {
   document.getElementById("lecturers").innerHTML = lecturersForModule.map(l =>
     `<button class="bubble-btn${l === activeLecturer ? ' active' : ''}" onclick="setLecturer('${l.replace(/'/g, "\\'")}')">${l}</button>`
   ).join("");
-
+ 
   buildTopics();
   filterDeck();
 }
-
+ 
 function setLecturer(l) {
   activeLecturer = l;
   activeTopic = "All";
   updateModuleView();
 }
-
+ 
 function buildTopics() {
   const matchingCards = RAW_DATA.filter(c => c.m === activeModule && c.l === activeLecturer);
   const ts = ["All", ...new Set(matchingCards.map(c => c.t))];
@@ -591,35 +630,45 @@ function buildTopics() {
     `<button class="bubble-btn${t === activeTopic ? ' active' : ''}" onclick="setTopic('${t.replace(/'/g, "\\'")}')">${t}</button>`
   ).join("");
 }
-
+ 
 function setTopic(t) {
   activeTopic = t;
   buildTopics();
   filterDeck();
 }
-
+ 
 function filterDeck() {
   const baseCards = RAW_DATA.filter(c => c.m === activeModule && c.l === activeLecturer);
   deck = activeTopic === "All" ? [...baseCards] : baseCards.filter(c => c.t === activeTopic);
   
-  idx = 0; flipped = false;
+  // Dynamic position recall key maps context down to Module + Lecturer + Topic variables
+  const lookupKey = `${activeModule}_${activeLecturer}_${activeTopic}`;
+  if (CARD_POSITIONS[lookupKey] !== undefined && CARD_POSITIONS[lookupKey] < deck.length) {
+    idx = CARD_POSITIONS[lookupKey];
+  } else {
+    idx = 0;
+  }
   
-  // Displays permanent metrics cleanly instead of wiping them back to zero
-  document.getElementById("s-easy").textContent = scores.easy;
-  document.getElementById("s-hard").textContent = scores.hard;
+  flipped = false;
   document.getElementById("card").classList.remove("flipped");
-  
+ 
+  // Refresh score counters relative to the newly loaded deck
+  syncScoresFromMap();
+ 
   render();
 }
-
+ 
 function shuffle() {
   for (let i = deck.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [deck[i], deck[j]] = [deck[j], deck[i]];
   }
-  idx = 0; flipped = false; render();
+  idx = 0; 
+  flipped = false; 
+  saveCurrentPosition();
+  render();
 }
-
+ 
 function flipCard() {
   if (!flipped) {
     flipped = true;
@@ -627,48 +676,103 @@ function flipCard() {
     triggerMathJax();
   }
 }
-
+ 
 function grade(easy, e) {
   e.stopPropagation();
-  if (easy) scores.easy++; else scores.hard++;
-  document.getElementById("s-easy").textContent = scores.easy;
-  document.getElementById("s-hard").textContent = scores.hard;
-  
   const currentCard = deck[idx];
-  if (currentCard) {
+  
+  if (easy) {
     SEEN_CARDS.set(currentCard.q, true);
-    localStorage.setItem('wbed_flashcard_progress', JSON.stringify([...SEEN_CARDS]));
+    HARD_CARDS.delete(currentCard.q);
+  } else {
+    HARD_CARDS.add(currentCard.q);
+    SEEN_CARDS.delete(currentCard.q);
   }
   
-  // Save both counters directly to disk
-  localStorage.setItem('wbed_flashcard_scores', JSON.stringify(scores));
+  localStorage.setItem('wbed_flashcard_progress', JSON.stringify([...SEEN_CARDS]));
+  localStorage.setItem('wbed_flashcard_hard', JSON.stringify([...HARD_CARDS]));
   
+  // Refresh UI based on the current deck context
+  syncScoresFromMap();
   go(1);
 }
-
-// Master progress erasure routine safely bound behind an alert prompt modal
+ 
+// Derives Got it / Needs work counts from the active deck rather than a
+// stale global counter, so switching lecturer or topic always shows
+// accurate numbers for that specific subset of cards.
+function syncScoresFromMap() {
+  const easyCount = deck.filter(c => SEEN_CARDS.has(c.q)).length;
+  const hardCount = deck.filter(c => HARD_CARDS.has(c.q)).length;
+ 
+  document.getElementById("s-easy").textContent = easyCount;
+  document.getElementById("s-hard").textContent = hardCount;
+ 
+  const rem = deck.length - (easyCount + hardCount);
+  const remEl = document.getElementById("s-rem");
+  if (remEl) remEl.textContent = rem > 0 ? `${rem} remaining` : "All reviewed!";
+}
+ 
 function clearSavedProgress() {
   const validationConfirmation = confirm("Are you sure you want to completely clear your flashcard completion history? This resets all percentages and category scores back to 0%.");
   
   if (validationConfirmation) {
     localStorage.removeItem('wbed_flashcard_progress');
-    localStorage.removeItem('wbed_flashcard_scores');
-    SEEN_CARDS = new Map();
-    scores = { easy: 0, hard: 0 };
+    localStorage.removeItem('wbed_flashcard_hard');
+    localStorage.removeItem('wbed_flashcard_positions');
     
+    SEEN_CARDS = new Map();
+    HARD_CARDS = new Set();
+    CARD_POSITIONS = {};
+    idx = 0;
+ 
+    syncScoresFromMap();
     updateGlobalModuleProgress();
     render();
   }
 }
-
+ 
 function go(dir) {
   if (deck.length === 0) return;
-  idx = Math.max(0, Math.min(deck.length - 1, idx + dir));
+ 
+  const needsWork = getNeedsWorkIndices();
+ 
+  if (dir === 1) {
+    // If we have 'needs work' cards remaining, jump to the next one
+    const nextNeedsWork = needsWork.find(i => i > idx);
+    
+    if (nextNeedsWork !== undefined) {
+      idx = nextNeedsWork;
+    } else if (needsWork.length > 0) {
+      // Loop back to the first 'needs work' card if we hit the end
+      idx = needsWork[0];
+    } else {
+      // If no 'needs work' cards, proceed normally
+      idx = Math.min(deck.length - 1, idx + 1);
+    }
+  } else {
+    // Standard back navigation
+    idx = Math.max(0, idx - 1);
+  }
+ 
   flipped = false;
   document.getElementById("card").classList.remove("flipped");
+  saveCurrentPosition();
   render();
 }
-
+ 
+function saveCurrentPosition() {
+  const lookupKey = `${activeModule}_${activeLecturer}_${activeTopic}`;
+  CARD_POSITIONS[lookupKey] = idx;
+  localStorage.setItem('wbed_flashcard_positions', JSON.stringify(CARD_POSITIONS));
+}
+ 
+function getNeedsWorkIndices() {
+  return deck
+    .map((card, index) => ({ card, index }))
+    .filter(item => !SEEN_CARDS.has(item.card.q))
+    .map(item => item.index);
+}
+ 
 function toggleModuleExpansion(e) {
   e.stopPropagation();
   const widget = document.getElementById("module-total-badge");
@@ -681,7 +785,7 @@ function toggleModuleExpansion(e) {
   }
   updateGlobalModuleProgress();
 }
-
+ 
 function toggleLecturerExpansion(lecturerName, e) {
   e.stopPropagation();
   if (EXPANDED_LECTURERS.has(lecturerName)) {
@@ -691,14 +795,14 @@ function toggleLecturerExpansion(lecturerName, e) {
   }
   updateGlobalModuleProgress();
 }
-
+ 
 function collapseAllProgressTrees() {
   const widget = document.getElementById("module-total-badge");
   widget.classList.remove("expanded");
   IS_MODULE_EXPANDED = false;
   EXPANDED_LECTURERS.clear();
 }
-
+ 
 function updateGlobalModuleProgress() {
   const totalCardsInModule = RAW_DATA.filter(c => c.m === activeModule);
   
@@ -724,7 +828,7 @@ function updateGlobalModuleProgress() {
   } else {
     widget.classList.remove("expanded");
   }
-
+ 
   const lecturersInModule = [...new Set(totalCardsInModule.map(c => c.l))].sort();
   const expandedContentArea = document.getElementById("badge-expanded-content");
   
@@ -759,13 +863,13 @@ function updateGlobalModuleProgress() {
   
   expandedContentArea.innerHTML = structuralHTML;
 }
-
+ 
 function triggerMathJax() {
   if (window.MathJax && window.MathJax.typesetPromise) {
     window.MathJax.typesetPromise();
   }
 }
-
+ 
 function render() {
   if (deck.length === 0) {
     document.getElementById("card-topic").textContent = "N/A";
@@ -781,7 +885,7 @@ function render() {
     updateGlobalModuleProgress();
     return;
   }
-
+ 
   const c = deck[idx];
   document.getElementById("card-topic").textContent = c.t;
   document.getElementById("card-topic-b").textContent = c.t;
@@ -795,16 +899,11 @@ function render() {
   
   document.getElementById("btn-prev").disabled = idx === 0;
   document.getElementById("btn-next").disabled = idx === deck.length - 1;
-  
-  // Computes the remaining category value dynamically using your loaded storage variables
-  const done = scores.easy + scores.hard;
-  const rem = deck.length - done;
-  document.getElementById("s-rem").textContent = rem > 0 ? `${rem} remaining` : "All reviewed!";
-
+ 
   updateGlobalModuleProgress();
   triggerMathJax();
 }
-
+ 
 fetchAllFlashcards();
 </script>
 </body>
