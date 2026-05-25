@@ -180,7 +180,6 @@
   }
  
   .card-face var { font-style: normal; }
- 
   .card-back { transform: rotateY(180deg); }
  
   .card-tag {
@@ -327,10 +326,8 @@
     color: var(--muted);
     box-shadow: 0 4px 16px rgba(0,0,0,0.06);
     z-index: 999;
-    
     width: max-content;
     max-width: calc(100vw - 3rem);
-    
     display: flex;
     flex-direction: column;
     gap: 8px;
@@ -389,9 +386,7 @@
     display: block;
   }
   
-  .lecturer-row-title:hover {
-    color: var(--accent);
-  }
+  .lecturer-row-title:hover { color: var(--accent); }
  
   .topics-sub-container {
     display: none;
@@ -445,21 +440,33 @@
     color: var(--surface);
     border-color: var(--text);
   }
- 
+
+  /* ── Mobile (portrait) overrides ── */
   @media (max-width: 480px) {
+
+    /* Hide the green progress bar + 0/0 label only */
+    .progress-wrap { display: none; }
+
+    /* Reset All — fixed bottom-left, same height as badge */
     .reset-btn {
-      position: static;
-      margin: 1rem auto 0;
-      box-shadow: none;
+      position: fixed;
+      bottom: 4.5rem;
+      left: 1rem;
+      margin: 0;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.06);
       display: block;
-      width: max-content;
+      width: auto;
     }
+
+    /* Progress badge — fixed bottom-right, same height as reset */
     .module-total-badge {
-      position: static;
-      margin: 1.5rem auto 0;
+      position: fixed;
+      bottom: 4.5rem;
+      right: 1rem;
+      margin: 0;
       width: max-content;
-      max-width: 100%;
-      box-shadow: none;
+      max-width: calc(100vw - 8rem); /* leave room for reset btn */
+      box-shadow: 0 4px 16px rgba(0,0,0,0.06);
       background: var(--surface);
       border: 1px solid var(--border);
     }
@@ -526,8 +533,7 @@
     <span class="total-badge-title" id="badge-module-name">...</span> Complete:&nbsp;
     <span class="total-badge-percent" id="badge-module-percent">0%</span>
   </div>
-  <div class="badge-expanded-content" id="badge-expanded-content">
-    </div>
+  <div class="badge-expanded-content" id="badge-expanded-content"></div>
 </div>
  
 <div class="module-footer" id="modules-bar"></div>
@@ -550,10 +556,6 @@ let HARD_CARDS = localStorage.getItem('wbed_flashcard_hard')
   ? new Set(JSON.parse(localStorage.getItem('wbed_flashcard_hard'))) 
   : new Set();
  
-// No persistent 'scores' object — counts are derived live from SEEN_CARDS / HARD_CARDS
-// filtered against the current deck in syncScoresFromMap().
- 
-// Load card position registry dictionary from local storage
 let CARD_POSITIONS = localStorage.getItem('wbed_flashcard_positions')
   ? JSON.parse(localStorage.getItem('wbed_flashcard_positions'))
   : {};
@@ -594,11 +596,9 @@ function buildModuleNavigation() {
  
 function setModule(m) {
   activeModule = m;
-  
   const lecturersForModule = [...new Set(RAW_DATA.filter(c => c.m === activeModule).map(c => c.l))];
   activeLecturer = lecturersForModule[0] || "";
   activeTopic = "All";
-  
   collapseAllProgressTrees();
   buildModuleNavigation();
   updateModuleView();
@@ -606,12 +606,10 @@ function setModule(m) {
  
 function updateModuleView() {
   document.getElementById("main-title").textContent = activeModule.toUpperCase();
-  
   const lecturersForModule = [...new Set(RAW_DATA.filter(c => c.m === activeModule).map(c => c.l))];
   document.getElementById("lecturers").innerHTML = lecturersForModule.map(l =>
     `<button class="bubble-btn${l === activeLecturer ? ' active' : ''}" onclick="setLecturer('${l.replace(/'/g, "\\'")}')">${l}</button>`
   ).join("");
- 
   buildTopics();
   filterDeck();
 }
@@ -625,7 +623,6 @@ function setLecturer(l) {
 function buildTopics() {
   const matchingCards = RAW_DATA.filter(c => c.m === activeModule && c.l === activeLecturer);
   const ts = ["All", ...new Set(matchingCards.map(c => c.t))];
-  
   document.getElementById("topics").innerHTML = ts.map(t =>
     `<button class="bubble-btn${t === activeTopic ? ' active' : ''}" onclick="setTopic('${t.replace(/'/g, "\\'")}')">${t}</button>`
   ).join("");
@@ -641,7 +638,6 @@ function filterDeck() {
   const baseCards = RAW_DATA.filter(c => c.m === activeModule && c.l === activeLecturer);
   deck = activeTopic === "All" ? [...baseCards] : baseCards.filter(c => c.t === activeTopic);
   
-  // Dynamic position recall key maps context down to Module + Lecturer + Topic variables
   const lookupKey = `${activeModule}_${activeLecturer}_${activeTopic}`;
   if (CARD_POSITIONS[lookupKey] !== undefined && CARD_POSITIONS[lookupKey] < deck.length) {
     idx = CARD_POSITIONS[lookupKey];
@@ -651,10 +647,7 @@ function filterDeck() {
   
   flipped = false;
   document.getElementById("card").classList.remove("flipped");
- 
-  // Refresh score counters relative to the newly loaded deck
   syncScoresFromMap();
- 
   render();
 }
  
@@ -680,7 +673,6 @@ function flipCard() {
 function grade(easy, e) {
   e.stopPropagation();
   const currentCard = deck[idx];
-  
   if (easy) {
     SEEN_CARDS.set(currentCard.q, true);
     HARD_CARDS.delete(currentCard.q);
@@ -688,25 +680,17 @@ function grade(easy, e) {
     HARD_CARDS.add(currentCard.q);
     SEEN_CARDS.delete(currentCard.q);
   }
-  
   localStorage.setItem('wbed_flashcard_progress', JSON.stringify([...SEEN_CARDS]));
   localStorage.setItem('wbed_flashcard_hard', JSON.stringify([...HARD_CARDS]));
-  
-  // Refresh UI based on the current deck context
   syncScoresFromMap();
   go(1);
 }
  
-// Derives Got it / Needs work counts from the active deck rather than a
-// stale global counter, so switching lecturer or topic always shows
-// accurate numbers for that specific subset of cards.
 function syncScoresFromMap() {
   const easyCount = deck.filter(c => SEEN_CARDS.has(c.q)).length;
   const hardCount = deck.filter(c => HARD_CARDS.has(c.q)).length;
- 
   document.getElementById("s-easy").textContent = easyCount;
   document.getElementById("s-hard").textContent = hardCount;
- 
   const rem = deck.length - (easyCount + hardCount);
   const remEl = document.getElementById("s-rem");
   if (remEl) remEl.textContent = rem > 0 ? `${rem} remaining` : "All reviewed!";
@@ -714,17 +698,14 @@ function syncScoresFromMap() {
  
 function clearSavedProgress() {
   const validationConfirmation = confirm("Are you sure you want to completely clear your flashcard completion history? This resets all percentages and category scores back to 0%.");
-  
   if (validationConfirmation) {
     localStorage.removeItem('wbed_flashcard_progress');
     localStorage.removeItem('wbed_flashcard_hard');
     localStorage.removeItem('wbed_flashcard_positions');
-    
     SEEN_CARDS = new Map();
     HARD_CARDS = new Set();
     CARD_POSITIONS = {};
     idx = 0;
- 
     syncScoresFromMap();
     updateGlobalModuleProgress();
     render();
@@ -733,27 +714,19 @@ function clearSavedProgress() {
  
 function go(dir) {
   if (deck.length === 0) return;
- 
   const needsWork = getNeedsWorkIndices();
- 
   if (dir === 1) {
-    // If we have 'needs work' cards remaining, jump to the next one
     const nextNeedsWork = needsWork.find(i => i > idx);
-    
     if (nextNeedsWork !== undefined) {
       idx = nextNeedsWork;
     } else if (needsWork.length > 0) {
-      // Loop back to the first 'needs work' card if we hit the end
       idx = needsWork[0];
     } else {
-      // If no 'needs work' cards, proceed normally
       idx = Math.min(deck.length - 1, idx + 1);
     }
   } else {
-    // Standard back navigation
     idx = Math.max(0, idx - 1);
   }
- 
   flipped = false;
   document.getElementById("card").classList.remove("flipped");
   saveCurrentPosition();
@@ -776,7 +749,6 @@ function getNeedsWorkIndices() {
 function toggleModuleExpansion(e) {
   e.stopPropagation();
   const widget = document.getElementById("module-total-badge");
-  
   if (widget.classList.contains("expanded")) {
     collapseAllProgressTrees();
   } else {
@@ -805,62 +777,49 @@ function collapseAllProgressTrees() {
  
 function updateGlobalModuleProgress() {
   const totalCardsInModule = RAW_DATA.filter(c => c.m === activeModule);
-  
   if (totalCardsInModule.length === 0) {
     document.getElementById("badge-module-name").textContent = activeModule.toUpperCase();
     document.getElementById("badge-module-percent").textContent = "0%";
     document.getElementById("badge-expanded-content").innerHTML = "";
     return;
   }
-  
   let moduleAnsweredCount = 0;
   totalCardsInModule.forEach(card => {
     if (SEEN_CARDS.has(card.q)) moduleAnsweredCount++;
   });
   const totalModulePercent = Math.round((moduleAnsweredCount / totalCardsInModule.length) * 100);
-  
   document.getElementById("badge-module-name").textContent = activeModule.toUpperCase();
   document.getElementById("badge-module-percent").textContent = `${totalModulePercent}%`;
-  
   const widget = document.getElementById("module-total-badge");
   if (IS_MODULE_EXPANDED) {
     widget.classList.add("expanded");
   } else {
     widget.classList.remove("expanded");
   }
- 
   const lecturersInModule = [...new Set(totalCardsInModule.map(c => c.l))].sort();
   const expandedContentArea = document.getElementById("badge-expanded-content");
-  
   let structuralHTML = "";
-  
   lecturersInModule.forEach(lec => {
     const cardsForLec = totalCardsInModule.filter(c => c.l === lec);
     let lecAnswered = 0;
     cardsForLec.forEach(c => { if (SEEN_CARDS.has(c.q)) lecAnswered++; });
     const lecPercent = Math.round((lecAnswered / cardsForLec.length) * 100);
-    
     const isLecExpanded = EXPANDED_LECTURERS.has(lec);
     const expandedClassStr = isLecExpanded ? " lecturer-progress-item lecturer-expanded" : " lecturer-progress-item";
-    
     structuralHTML += `<div class="${expandedClassStr}">`;
     structuralHTML += `  <span class="lecturer-row-title" onclick="toggleLecturerExpansion('${lec.replace(/'/g, "\\'")}', event)">${lec} - ${lecPercent}%</span>`;
     structuralHTML += `  <div class="topics-sub-container">`;
-    
     const topicsForLec = [...new Set(cardsForLec.map(c => c.t))].sort();
     topicsForLec.forEach(top => {
       const cardsForTopic = cardsForLec.filter(c => c.t === top);
       let topAnswered = 0;
       cardsForTopic.forEach(c => { if (SEEN_CARDS.has(c.q)) topAnswered++; });
       const topPercent = Math.round((topAnswered / cardsForTopic.length) * 100);
-      
       structuralHTML += `    <span class="topic-progress-row">${top.toUpperCase()} - ${topPercent}%</span>`;
     });
-    
     structuralHTML += `  </div>`;
     structuralHTML += `</div>`;
   });
-  
   expandedContentArea.innerHTML = structuralHTML;
 }
  
@@ -885,21 +844,17 @@ function render() {
     updateGlobalModuleProgress();
     return;
   }
- 
   const c = deck[idx];
   document.getElementById("card-topic").textContent = c.t;
   document.getElementById("card-topic-b").textContent = c.t;
   document.getElementById("card-q").textContent = c.q;
   document.getElementById("card-a").textContent = c.a;
-  
   const label = `${idx + 1} / ${deck.length}`;
   document.getElementById("counter").textContent = label;
   document.getElementById("counter2").textContent = label;
   document.getElementById("prog").style.width = ((idx + 1) / deck.length * 100) + "%";
-  
   document.getElementById("btn-prev").disabled = idx === 0;
   document.getElementById("btn-next").disabled = idx === deck.length - 1;
- 
   updateGlobalModuleProgress();
   triggerMathJax();
 }
