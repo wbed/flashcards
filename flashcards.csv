@@ -118,3 +118,47 @@ CMB219,Richard Thackray,Equations,State the industrial Rolling Load Force equati
 CMB219,Richard Thackray,Equations,State the complete Extrusion Ratio and Extrusion Pressure normalized formulas,"**Extrusion Ratio:** $R = \frac{A_o}{A_f} \ln(R)$ \n**Extrusion Pressure:** $\frac{P}{\sigma_{\text{flow}}} = a + b \ln(R)$ \n\nWhere $P$ is extrusion pressure, $A_o$ is initial billet cross-sectional area, $A_f$ is final product area, $\sigma_{\text{flow}}$ is flow stress, and $a, b$ represent experimental extrusion constants."
 CMB219,Richard Thackray,Equations,State the Forging Load Upsetting Force formula and identify its variables,"$$P = \sigma_{\text{flow}} \cdot \left(1 + \frac{2 m r}{3 h}\right)$$ \n\nCalculates press requirements: \n$P$ = total forging force \n$\sigma_{\text{flow}}$ = material flow stress \n$m$ = operational interface friction factor \n$r$ = effective radius of the cylinder workpiece \n$h$ = instantaneous height of the workpiece."
 CMB219,Richard Thackray,Equations,State the Hall-Petch grain size strengthening formula and identify its parameters,"$$\sigma_o = \sigma_I + \frac{k}{\sqrt{d}}$$ \n\nWhere: \n$\sigma_o$ = total observed material yield strength \n$\sigma_I$ = intrinsic lattice friction stress resisting dislocation movement \n$k$ = material-specific locking constant \n$d$ = average crystal grain diameter."
+CMB236,Kathy Christofidou,Metals,State Hooke's Law for normal stress.,$\sigma = E\epsilon$
+CMB236,Kathy Christofidou,Metals,State Hooke's Law for shear stress.,$\tau = G\gamma$
+CMB236,Kathy Christofidou,Metals,State the equation for elastic strain energy density under normal loading.,$\frac{1}{2}E\epsilon^2$
+CMB236,Kathy Christofidou,Metals,State the equation for elastic strain energy density under shear loading.,$\frac{1}{2}G\gamma^2$
+CMB236,Kathy Christofidou,Metals,What causes plastic deformation in metals?,Atomic planes slide over each other due to shear stresses.
+CMB236,Kathy Christofidou,Metals,What is an edge dislocation?,A dislocation where the line vector is perpendicular to the Burgers vector.
+CMB236,Kathy Christofidou,Metals,What is a screw dislocation?,A helical/spiral defect where the line vector is parallel to the Burgers vector.
+CMB236,Kathy Christofidou,Metals,What is the Burgers vector?,The difference between the perfect crystal and the dislocation.
+CMB236,Kathy Christofidou,Metals,State the equation for the force acting on a dislocation.,$F = \tau b$
+CMB236,Kathy Christofidou,Metals,State the equation for dislocation strain energy/line tension.,$\Lambda = aGb^2 \approx \frac{1}{2}Gb^2$
+CMB236,Kathy Christofidou,Metals,What is the Peierls–Nabarro stress?,The minimum shear stress required to move a dislocation.
+CMB236,Kathy Christofidou,Metals,How does PN stress behave in FCC metals?,PN stress is not temperature dependent in FCC metals.
+CMB236,Kathy Christofidou,Metals,How does PN stress behave in BCC and HCP metals?,PN stress is temperature dependent in BCC and HCP metals.
+CMB236,Kathy Christofidou,Metals,State the FCC slip system family.,$\{111\}\langle1\bar{1}0\rangle$
+CMB236,Kathy Christofidou,Metals,State the BCC slip system family.,$\{110\}\langle111\rangle$
+CMB236,Kathy Christofidou,Metals,State the HCP slip system family.,$\{001\}\langle100\rangle$
+CMB236,Kathy Christofidou,Metals,State Schmid’s Law.,$\tau_{crss} = \sigma_y \cos\phi \cos\lambda$
+CMB236,Kathy Christofidou,Metals,What is the Schmid factor?,$\cos\phi \cos\lambda$
+CMB236,Kathy Christofidou,Metals,Which slip system yields first?,The slip system with the greatest Schmid factor.
+CMB236,Kathy Christofidou,Metals,What does OILS stand for?,zerO Intermediate Least Sign
+CMB236,Kathy Christofidou,Metals,How do dislocations of the same sign interact?,They repel.
+CMB236,Kathy Christofidou,Metals,How do dislocations of opposite sign interact?,They attract and annihilate.
+CMB236,Kathy Christofidou,Metals,What is cross-slip?,Screw dislocations gliding on a different plane to pass obstacles.
+CMB236,Kathy Christofidou,Metals,What is dislocation climb?,Edge dislocations moving onto other slip planes via climb.
+CMB236,Kathy Christofidou,Metals,State Frank's Rule for combining dislocations.,$b_3^2 < b_1^2 + b_2^2$
+CMB236,Kathy Christofidou,Metals,State Frank's Rule for splitting into partial dislocations.,$b_1^2 > b_2^2 + b_3^2$
+CMB236,Kathy Christofidou,Metals,What is a Frank-Read source?,A pinned dislocation bows out under shear stress to form loops and generate dislocations.
+CMB236,Kathy Christofidou,Metals,Why is cross-slip hardest in low stacking fault energy materials?,Partial dislocations are furthest apart and require the most energy to recombine.
+CMB236,Kathy Christofidou,Metals,How does low stacking fault energy affect work hardening?,Work hardening occurs rapidly in low SFE materials.
+CMB236,Kathy Christofidou,Metals,What characterises Stage 1 FCC single crystal deformation?,Easy glide on one slip system with very low but constant work hardening.
+CMB236,Kathy Christofidou,Metals,What characterises Stage 2 FCC single crystal deformation?,"Multiple glide with dislocation interactions producing jogs, locks and pileups."
+CMB236,Kathy Christofidou,Metals,State the relationship between dislocation density and spacing.,$\rho = \frac{1}{L^2}$
+CMB236,Kathy Christofidou,Metals,How does yield strength vary with dislocation density?,$\sigma_Y \propto \sqrt{\rho}$
+CMB236,Kathy Christofidou,Metals,State the Hall-Petch equation.,$\sigma_Y = \sigma_0 + \frac{k}{d^x}$
+CMB236,Kathy Christofidou,Metals,How does solid solution strengthening vary with concentration?,$\sigma_Y \propto \sqrt{C}$
+CMB236,Kathy Christofidou,Metals,What is a Cottrell atmosphere?,A cloud of solute atoms around the dislocation core.
+CMB236,Kathy Christofidou,Metals,What causes Luders bands?,Dislocations escaping Cottrell atmospheres causing yielding and work hardening.
+CMB236,Kathy Christofidou,Metals,State the equation for lattice misfit strain.,$\epsilon_{misfit} = \frac{a_{precipitate}-a_{matrix}}{a_{matrix}}$
+CMB236,Kathy Christofidou,Metals,How does shear strength vary during precipitate cutting?,$\tau \propto \sqrt{r}$
+CMB236,Kathy Christofidou,Metals,How does shear strength vary during Orowan bowing?,$\tau \propto \frac{1}{r}$
+CMB236,Kathy Christofidou,Metals,What is twinning?,Simultaneous shearing of successive atomic planes producing mirror-image crystals.
+CMB236,Kathy Christofidou,Metals,Why does low stacking fault energy favour twinning?,"More energy is required to recombine partial dislocations, inhibiting slip."
+CMB236,Kathy Christofidou,Metals,What is recovery during annealing?,Dislocation density decreases as migration and annihilation occur.
+CMB236,Kathy Christofidou,Metals,What is recrystallisation?,Existing grains are replaced by new grains.
