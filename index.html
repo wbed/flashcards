@@ -447,23 +447,33 @@
   }
 
   .refresh-btn {
-  display: flex !important; /* Forces visibility always */
+  display: flex !important;
   align-items: center;
   justify-content: center;
-  position: fixed;         /* Locks it relative to the screen browser boundaries */
-  top: 1rem;               /* 16px down from the top edge */
-  right: 1rem;             /* 16px in from the right edge */
-  width: 38px;
-  height: 38px;
+  
+  /* Absolute alignment inline with the main title text */
+  position: absolute;
+  top: 4px; 
+  right: 12px;
+  
+  width: 36px;
+  height: 36px;
   background: var(--accent);
   color: #ffffff;
   border: 1px solid var(--accent);
   border-radius: 8px;
-  font-size: 1.25rem;
+  
+  /* Centering Fixes */
+  font-family: Arial, Helvetica, sans-serif; /* System font stack for clean symbol rendering */
+  font-size: 1.4rem;
   font-weight: bold;
+  line-height: 1;
+  text-align: center;
+  padding: 0;
+  
   cursor: pointer;
   transition: all 0.15s ease;
-  z-index: 9999;           /* Layers it on top of absolutely everything else */
+  z-index: 10;
 }
 
 .refresh-btn:hover, .refresh-btn:active {
@@ -537,9 +547,8 @@
 </head>
 <body class="tex2jax_ignore">
 
-<button class="refresh-btn" onclick="window.location.reload();" title="Refresh Application">&#8635;</button>
-
 <header>
+  <button class="refresh-btn" onclick="window.location.reload();" title="Refresh Application">&#8635;</button>
   <h1 id="main-title">...</h1>
   <div class="bubble-bar tex2jax_process" id="lecturers"></div>
 </header>
